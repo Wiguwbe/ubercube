@@ -18,34 +18,6 @@ in float shadowDist;
 in float zDist;
 in float renderShadows;
 
-int getShadowCascadeID(float[SHADOW_CASCADE_COUNT + 1] cascadDistances, float dist)
-{
-	for (int i = 0; i < SHADOW_CASCADE_COUNT; i++)
-	{
-		if (dist < cascadDistances[i + 1])
-			return i;
-	}
-	return SHADOW_CASCADE_COUNT - 1;
-}
-
-float calcShadowFactor(vec4[SHADOW_CASCADE_COUNT] lightPos, float[SHADOW_CASCADE_COUNT + 1] cascadDistances, float dist)
-{
-	int shadowMapID = getShadowCascadeID(cascadDistances, dist);
-	vec4 lightPosition = lightPos[shadowMapID];
-
-    vec3 projCoords = lightPosition.xyz / lightPosition.w;
-    projCoords = projCoords * 0.5 + 0.5;
-
-    float closestDepth = texture(shadowMap[shadowMapID], projCoords.xy).r;
-    float currentDepth = projCoords.z;
-
-	float bias = 0.00001 * (10.0 * (shadowMapID + 1));
-
-    if (currentDepth - bias > closestDepth)
-    	return 1.0 - 0.5;
-    return 1.0;
-}
-
 void main(void)
 {
 	float fragDist = distance(cameraPosition.xz, worldPosition.xz);
@@ -62,7 +34,28 @@ void main(void)
 	vec4 shadow = vec4(1, 1, 1, 1);
 	if (renderShadows > 5)
 	{
-		float shadowFactor = calcShadowFactor(lightPositions, shadowCascadeDistances, zDist);
+		float shadowFactor = 1.0;
+		int shadowMapID = SHADOW_CASCADE_COUNT - 1;
+		for (int i = 0; i< SHADOW_CASCADE_COUNT; i++)
+		{
+			if (zDist < shadowCascadeDistances[i + 1])
+			{
+				shadowMapID = i;
+				break;
+			}
+		}
+		vec4 lightPosition = lightPositions[shadowMapID];
+
+		vec3 projCoords = lightPosition.xyz / lightPosition.w;
+		projCoords = projCoords * 0.5 + 0.5;
+
+		float closestDepth = texture(shadowMap[shadowMapID], projCoords.xy).r;
+		float currentDepth = projCoords.z;
+
+		float bias = 0.00001 * (10.0 * (shadowMapID + 1));
+
+		if (currentDepth - bias > closestDepth)
+			shadowFactor = 1.0 - 0.5;
 		shadow = vec4(shadowFactor, shadowFactor, shadowFactor, 1.0);
 	}
 	vec4 finalColor = color * 1.2f * shadow;
