@@ -50,7 +50,7 @@ public class ObjModelLoader {
 		List<Vec3> position = new ArrayList<Vec3>();
 		List<OBJIndex> indices = new ArrayList<OBJIndex>();
 		List<Vec3> normals = new ArrayList<Vec3>();
-		String mtlFile = modelFile.split("\\.")[0] + ".mtl";
+		String mtlFile = modelFile.substring(0, modelFile.length()-4) + ".mtl";
 		HashMap<String, Color4f> colors = loadMaterialColors(mtlFile);
 
 		try {
