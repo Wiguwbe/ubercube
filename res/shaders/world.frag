@@ -49,7 +49,18 @@ void main(void)
 		vec3 projCoords = lightPosition.xyz / lightPosition.w;
 		projCoords = projCoords * 0.5 + 0.5;
 
-		float closestDepth = texture(shadowMap[shadowMapID], projCoords.xy).r;
+		float closestDepth;
+		switch(shadowMapID) {
+			case 0:
+				closestDepth = texture(shadowMap[0], projCoords.xy).r;
+				break;
+			case 1:
+				closestDepth = texture(shadowMap[1], projCoords.xy).r;
+				break;
+			default:
+				closestDepth = texture(shadowMap[2], projCoords.xy).r;
+		}
+		//1float closestDepth = texture(shadowMap[shadowMapID], projCoords.xy).r;
 		float currentDepth = projCoords.z;
 
 		float bias = 0.00001 * (10.0 * (shadowMapID + 1));
