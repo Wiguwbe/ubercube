@@ -1,0 +1,3 @@
+#!/bin/bash
+cd ~/.ubercube
+java -cp ubercube.jar fr.veridiangames.server.ServerMain "$@"
