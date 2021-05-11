@@ -46,6 +46,7 @@ public class WeaponAWP extends FireWeapon
 		this.setPosition(0);
 		this.setFireFrequency(1);
 		this.setMaxBullets(5);
+		this.setBulletsLeft(5);
 		this.setRecoil(0.3f);
 		this.setRecoilOnZoom(0.1f);
 		this.setDamage(70);
