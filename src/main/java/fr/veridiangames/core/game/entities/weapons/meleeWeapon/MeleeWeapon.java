@@ -88,7 +88,6 @@ public class MeleeWeapon extends Weapon
 
 	public void onActionDown()
 	{
-		System.out.println("LOL");
 		attack = true;
 	}
 
