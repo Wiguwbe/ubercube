@@ -39,10 +39,12 @@ import fr.veridiangames.server.server.NetworkServer;
 public class FireWeapon extends Weapon
 {
 	private int fireFrequency = 10; // per seconds
+	private int reloadTime = 60;	// time to reload, sixtieths of second (1/60) seconds
 	
 	private Transform shootPoint;
 	private boolean shooting;
 	private boolean shot;
+	private boolean reloading = false;
 	private float shootForce = 0.2f;
 	private float shootPecision = 0.5f;
 	private float shootPecisionIdle = 0.5f;
@@ -52,6 +54,7 @@ public class FireWeapon extends Weapon
 	private int damage = 20;
 
 	private int shootTimer = 0;
+	private int reloadTimer = 0;
 
 	private int maxBullets;
 	private int bulletsLeft;
@@ -88,6 +91,19 @@ public class FireWeapon extends Weapon
 				super.updateBobbing(movementVelocity.magnitude(), 0.15f, 0.2f);
 				super.updateWeaponVelocity(movement.getVelocity(1), dx, dy, 0.0008f);
 			}
+		}
+
+		if (reloading)
+		{
+			if(reloadTimer > reloadTime)
+			{
+				reloading = false;
+				bulletsLeft = maxBullets;
+				shot = false;
+			}
+
+			reloadTimer++;
+			return;
 		}
 
 		if (shooting)
@@ -143,12 +159,19 @@ public class FireWeapon extends Weapon
 	public void shoot()
 	{
 		shooting = true;
+		if (bulletsLeft == 0 && !reloading)
+		{
+			reloadBullets();
+			return;
+		}
+
 		if (shot)
 			return;
 		if (zoomed)
 			shootPecision = shootPecisionZoomed;
 		else
 			shootPecision = shootPecisionIdle;
+
 
 		Vec3 shootVector = new Vec3(transform.getLocalPosition()).sub(transform.getLocalRotation().getForward().copy().mul(0, 0, shootPecision));
 		this.transform.setLocalPosition(shootVector);
@@ -162,20 +185,18 @@ public class FireWeapon extends Weapon
 
 	private void removeBullet()
 	{
+		if (bulletsLeft == 0)
+			// TODO raise exception
+			return;
 		bulletsLeft--;
-
-		if (bulletsLeft < 0)
-		{
-			bulletsLeft = 0;
-			reloadBullets();
-		}
 	}
 
 	protected void setShootForce(float shootForce) { this.shootForce = shootForce; }
 
 	public void reloadBullets()
 	{
-		bulletsLeft = maxBullets;
+		reloading = true;
+		reloadTimer = 0;
 	}
 
 	public int getFireFrequency()
@@ -246,5 +267,22 @@ public class FireWeapon extends Weapon
 
 	public int getDamage() {
 		return damage;
+	}
+
+	public void setReloadTime(int reloadTime) {
+		this.reloadTime = reloadTime;
+	}
+
+	public int getReloadTime() {
+		return this.reloadTime;
+	}
+
+	// and in seconds
+	public void setReloadTimeSeconds(float reloadTime) {
+		this.reloadTime = (int)(60 * reloadTime);
+	}
+
+	public float getReloadTimeSeconds() {
+		return 60f / this.reloadTime;
 	}
 }
