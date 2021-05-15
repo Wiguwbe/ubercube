@@ -62,7 +62,7 @@ public class ServerMain
 	public ServerMain(int port, String filePath)
 	{
 		this.config = new Configuration();
-		config.load("ubercube.cfg");
+		config.load(filePath);
 
 		instance = this;
 
@@ -89,7 +89,7 @@ public class ServerMain
 			new ServerMain(Integer.parseInt(args[0]));
 		else if ( args.length == 2)
 			new ServerMain(Integer.parseInt(args[0]), args[1]);
-		else if (args.length != 1)
-			System.out.println("Usage: ./ubercube_server port");
+		else
+			System.out.println("Usage: ./ubercube_server port [configFile]");
 	}
 }
