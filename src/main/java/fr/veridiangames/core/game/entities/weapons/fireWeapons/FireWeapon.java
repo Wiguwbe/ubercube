@@ -195,6 +195,10 @@ public class FireWeapon extends Weapon
 
 	public void reloadBullets()
 	{
+		if(reloading) {
+			// already reloading
+			return;
+		}
 		reloading = true;
 		reloadTimer = 0;
 	}
